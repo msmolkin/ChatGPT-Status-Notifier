@@ -1,43 +1,60 @@
 {
-    "manifest_version": 2,
-    "name": "Is ChatGPT Typing?",
-    "version": "0.0.4",
-    "description": "A Firefox add-on that lets you know when ChatGPT has finished typing. Don't forget to pin the addon to your toolbar to be able to see when it finishes typing!",
-    "permissions": ["tabs", "storage", "activeTab", "https://chat.openai.com/*"],
-    "content_scripts": [
-        {
-          "matches": ["https://chat.openai.com/*"],
-          "js": ["content_script.js"]
-        }
+  "manifest_version": 2,
+  "name": "AI Chat Status Notifier",
+  "version": "0.1.0",
+  "description": "A Firefox add-on that lets you know when ChatGPT or Claude has finished typing. Don't forget to pin the addon to your toolbar to be able to see when it finishes typing!",
+  "permissions": [
+    "tabs",
+    "storage",
+    "activeTab",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://claude.ai/*"
       ],
-    "background": {
-        "scripts": ["background.js"],
-        "persistent": false
-    },
-    "icons": {
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png",
-      "1024": "icons/icon1024.png"
-
-    },
-    "browser_action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "48": "icons/icon48.png"
-      },
-      "default_title": "Is ChatGPT Typing?"
-    },
-    "web_accessible_resources": [
-      "content_script.js"
+      "js": [
+        "content_script.js"
+      ]
+    }
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
     ],
-    "developer": {
-      "name": "Smolk LLC",
-      "url": "https://www.smolkin.org/addons/ChatGPT-Status-Notifier.html"
+    "persistent": false
+  },
+  "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png",
+    "1024": "icons/icon1024.png"
+  },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icons/icon48.png"
     },
-    "homepage_url": "https://www.smolkin.org/addons/ChatGPT-Status-Notifier.html",
-    "author": "Smolk LLC",
-    "options_ui": {
-      "page": "options.html",
-      "chrome_style": true
-    }   
+    "default_title": "Is ChatGPT Typing?"
+  },
+  "web_accessible_resources": [
+    "content_script.js"
+  ],
+  "developer": {
+    "name": "Smolk LLC",
+    "url": "https://www.smolkin.org/addons/ChatGPT-Status-Notifier.html"
+  },
+  "homepage_url": "https://www.smolkin.org/addons/ChatGPT-Status-Notifier.html",
+  "author": "Smolk LLC",
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{47d018dd-59c1-4de0-abca-c010ca272a81}"
+    }
+  }
 }

@@ -1,5 +1,5 @@
 // Author: Michael Smolkin
-// Date: 2023-05-08
+// Date: 2023-05-08, Updated: 2025-04-06
 // License: MIT
 
 // Listen for messages from content scripts
@@ -10,36 +10,56 @@
  * @param {Function} sendResponse
  * @returns {Promise<void>}
  * 
- * Badge the app icon with "typing…" when ChatGPT is generating a response.
+ * Badge the app icon with "typing…" when AI (ChatGPT or Claude) is generating a response.
  * Also play a sound when the response is ready.
  */
 let prevGeneratingState = false;
 
 browser.runtime.onMessage.addListener((message, sender) => {
     if (message.type === "updateGeneratingState") {
-        if (Boolean(message.data)) {
-            badgeText = "…"
+        const isGenerating = Boolean(message.data);
+        const site = message.site || "unknown"; // 'chatgpt' or 'claude'
+        
+        if (isGenerating) {
+            badgeText = "…";
+            // Set badge color based on the site
+            const badgeColor = site === 'claude' ? "#7F5AF0" : "#00FF00"; // Purple for Claude, Green for ChatGPT
+            browser.browserAction.setBadgeBackgroundColor({ color: badgeColor });
         } else {
             badgeText = "";
-            // play a sound if GPT is not typing now && was typing during the last message && the play sound setting is enabled
+            // play a sound if AI is not typing now && was typing during the last message && the play sound setting is enabled
+            // play a sound if AI is not typing now && was typing during the last message && the play sound setting is enabled
             if (prevGeneratingState) {
                 browser.browserAction.setBadgeText({ text: "!" });
-                console.log("Response ready!");
-
+                console.log(`${site === 'claude' ? 'Claude' : 'ChatGPT'} response ready!`);
                 browser.storage.local.get("playSound").then((result) => {
                     if (result.playSound) {
-                        let audioBase64 = ding;
-                        var audio = new Audio(audioBase64);
-                        audio.play();
+                        try {
+                            let audioBase64 = ding;
+                            var audio = new Audio(audioBase64);
+                            let playPromise = audio.play();
+                            
+                            // Handle the play promise to catch any errors
+                            if (playPromise !== undefined) {
+                                playPromise.then(() => {
+                                    // Audio is playing
+                                    console.log("Sound played successfully");
+                                }).catch(error => {
+                                    console.error("Error playing sound:", error);
+                                });
+                            }
+                        } catch (error) {
+                            console.error(`Error playing sound: ${error}`);
+                        }
                     }
                 }).catch((error) => {
                     console.error(`Error: ${error}`);
                 });
             }
         }
-        prevGeneratingState = Boolean(message.data);
+        
+        prevGeneratingState = isGenerating;
         browser.browserAction.setBadgeText({ text: badgeText });
-        browser.browserAction.setBadgeBackgroundColor({ color: "#00FF00" });
     }
 });
 
