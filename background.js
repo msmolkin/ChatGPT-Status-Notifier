@@ -13,53 +13,82 @@
  * Badge the app icon with "typing…" when AI (ChatGPT or Claude) is generating a response.
  * Also play a sound when the response is ready.
  */
-let prevGeneratingState = false;
+let tabStates = {}; // Map of tabId -> { isGenerating: boolean, site: string }
+let prevGlobalGeneratingState = false;
+
+// Evaluates all tracked tabs and updates the extension badge/sound accordingly
+function evaluateGlobalState(lastActiveSite) {
+    let anyGenerating = false;
+    let activeSite = lastActiveSite || "unknown";
+    
+    // Check if any tab is currently generating
+    for (const id in tabStates) {
+        if (tabStates[id] && tabStates[id].isGenerating) {
+            anyGenerating = true;
+            activeSite = tabStates[id].site;
+            break; 
+        }
+    }
+    
+    if (anyGenerating) {
+        browser.browserAction.setBadgeText({ text: "…" });
+        const badgeColor = activeSite === 'claude' ? "#7F5AF0" : "#00FF00"; // Purple for Claude, Green for ChatGPT
+        browser.browserAction.setBadgeBackgroundColor({ color: badgeColor });
+    } else {
+        browser.browserAction.setBadgeText({ text: "" });
+        
+        // Play a sound ONLY if AI was typing globally and has now stopped completely
+        if (prevGlobalGeneratingState) {
+            browser.browserAction.setBadgeText({ text: "!" });
+            console.log(`AI response ready!`);
+            browser.storage.local.get("playSound").then((result) => {
+                if (result.playSound) {
+                    try {
+                        let audioBase64 = ding;
+                        var audio = new Audio(audioBase64);
+                        let playPromise = audio.play();
+                        
+                        // Handle the play promise to catch any errors
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                // Audio is playing
+                                console.log("Sound played successfully");
+                            }).catch(error => {
+                                console.error("Error playing sound:", error);
+                            });
+                        }
+                    } catch (error) {
+                        console.error(`Error playing sound: ${error}`);
+                    }
+                }
+            }).catch((error) => {
+                console.error(`Error: ${error}`);
+            });
+        }
+    }
+    
+    prevGlobalGeneratingState = anyGenerating;
+}
 
 browser.runtime.onMessage.addListener((message, sender) => {
-    if (message.type === "updateGeneratingState") {
+    if (message.type === "updateGeneratingState" && sender.tab) {
+        const tabId = sender.tab.id;
         const isGenerating = Boolean(message.data);
-        const site = message.site || "unknown"; // 'chatgpt' or 'claude'
+        const site = message.site || "unknown"; 
         
-        if (isGenerating) {
-            badgeText = "…";
-            // Set badge color based on the site
-            const badgeColor = site === 'claude' ? "#7F5AF0" : "#00FF00"; // Purple for Claude, Green for ChatGPT
-            browser.browserAction.setBadgeBackgroundColor({ color: badgeColor });
-        } else {
-            badgeText = "";
-            // play a sound if AI is not typing now && was typing during the last message && the play sound setting is enabled
-            // play a sound if AI is not typing now && was typing during the last message && the play sound setting is enabled
-            if (prevGeneratingState) {
-                browser.browserAction.setBadgeText({ text: "!" });
-                console.log(`${site === 'claude' ? 'Claude' : 'ChatGPT'} response ready!`);
-                browser.storage.local.get("playSound").then((result) => {
-                    if (result.playSound) {
-                        try {
-                            let audioBase64 = ding;
-                            var audio = new Audio(audioBase64);
-                            let playPromise = audio.play();
-                            
-                            // Handle the play promise to catch any errors
-                            if (playPromise !== undefined) {
-                                playPromise.then(() => {
-                                    // Audio is playing
-                                    console.log("Sound played successfully");
-                                }).catch(error => {
-                                    console.error("Error playing sound:", error);
-                                });
-                            }
-                        } catch (error) {
-                            console.error(`Error playing sound: ${error}`);
-                        }
-                    }
-                }).catch((error) => {
-                    console.error(`Error: ${error}`);
-                });
-            }
-        }
+        // Track the typing state mapped to this specific tab
+        tabStates[tabId] = { isGenerating, site };
         
-        prevGeneratingState = isGenerating;
-        browser.browserAction.setBadgeText({ text: badgeText });
+        // Re-evaluate the overall badge/icon state across all tabs
+        evaluateGlobalState(site);
+    }
+});
+
+// Clean up tabs when they are closed so they don't break the state tracker
+browser.tabs.onRemoved.addListener((tabId) => {
+    if (tabStates[tabId]) {
+        delete tabStates[tabId];
+        evaluateGlobalState();
     }
 });
 
