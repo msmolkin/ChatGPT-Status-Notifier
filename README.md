@@ -23,16 +23,28 @@ I decided to split this functionality out into its own project, resulting in the
 
 To install the ChatGPT Status Notifier Firefox Addon:
 
-1. Visit the [Mozilla Addon Page](https://addons.mozilla.org/en-US/firefox/addon/chatgpt-status-notifier/) for ChatGPT Status Notifier.
+1. Visit the [Mozilla Addon Page](https://addons.mozilla.org/en-US/firefox/addon/ai-status-notifier/) for AI Chat Status Notifier.
 2. Click on the "Add to Firefox" button and follow the prompts.
 
-To install the ChatGPT Status Notifier from source:
+## Building from Source
+
+There is no build process required. Simply clone the repository and run `npm run build` or use the `build` script to package the extension into a zip file.
+
+You can then load the extension in Firefox by going to `about:debugging#/runtime/this-firefox` and clicking "Load Temporary Add-on...".
+
+The build script will create a zip file in the `build` directory.
+
+You can also load the extension in Firefox by going to `about:debugging#/runtime/this-firefox` and clicking "Load Temporary Add-on...".
 
 1. Download or clone this repository
 2. Open Firefox and navigate to `about:debugging`
 3. Click on "This Firefox"
 4. Click on "Load Temporary Add-on"
 5. Open the downloaded or cloned folder and select any file inside the folder
+
+## Automatic Publishing via GitHub Actions
+
+This repository is configured to automatically publish new updates to the Mozilla Add-on store whenever new commits are pushed to the `main` branch. 
 
 ## Usage
 

@@ -24,7 +24,7 @@ function waitFor(selector) {
  * @returns {string} - 'chatgpt' or 'claude'
  */
 function getSiteType() {
-  if (window.location.href.includes('chat.openai.com')) {
+  if (window.location.href.includes('chat.openai.com') || window.location.href.includes('chatgpt.com')) {
     return 'chatgpt';
   } else if (window.location.href.includes('claude.ai')) {
     return 'claude';

@@ -1,0 +1,30 @@
+name: Publish Firefox Add-on
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.github/**'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+
+      - name: Install web-ext
+        run: npm install -g web-ext
+
+      - name: Build and Sign Add-on
+        run: web-ext sign --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }} --channel=listed
+        env:
+          WEB_EXT_SOURCE_DIR: '.'
