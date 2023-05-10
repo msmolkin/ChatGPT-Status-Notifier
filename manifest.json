@@ -1,0 +1,38 @@
+{
+    "manifest_version": 2,
+    "name": "Is ChatGPT Typing?",
+    "version": "0.0.1",
+    "description": "A Firefox add-on that lets you know when ChatGPT has finished typing.",
+    "permissions": ["tabs", "storage", "activeTab", "https://chat.openai.com/*"],
+    "content_scripts": [
+        {
+          "matches": ["https://chat.openai.com/*"],
+          "js": ["content_script.js"]
+        }
+      ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "icons": {
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png",
+      "1024": "icons/icon1024.png"
+
+    },
+    "browser_action": {
+      "default_icon": {
+        "48": "icons/icon48.png"
+      },
+      "default_title": "Is ChatGPT Typing?"
+    },
+    "web_accessible_resources": [
+      "content_script.js"
+    ],
+    "developer": {
+      "name": "Smolk LLC",
+      "url": "https://www.smolkin.org/addons/chatgpt-search"
+    },
+    "homepage_url": "https://www.smolkin.org/addons/chatgpt-search",
+    "author": "Smolk LLC"
+}
