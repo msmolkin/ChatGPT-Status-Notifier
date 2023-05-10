@@ -2,7 +2,8 @@
 
 This repository hosts the code for the Firefox Addon, "Is ChatGPT Typing?". The addon notifies users when ChatGPT, OpenAI's language model, has finished typing in the OpenAI chat. It is ideal for those who use the chat interface regularly and want real-time updates on the typing status of ChatGPT.
 
-![Addon Screenshot](images/screenshot.png)
+![Addon Screenshot while GPT is typing](<images/screenshot typing.png>)
+![Addon Screenshot when GPT isn't typing](<images/screenshot idle.png>)
 
 ## Features
 
@@ -15,6 +16,8 @@ This repository hosts the code for the Firefox Addon, "Is ChatGPT Typing?". The 
 This project is a derivative of the [ChatGPT Search](https://github.com/msmolkin/ChatGPT-Search) project. While developing that project, a simpler idea for an addon took shape. Initially, the entire code was incorporated into the ChatGPT Search project, but it quickly became evident that my projects were becoming too multifaceted, always incorporating numerous features.
 
 I decided to split this functionality out into its own project, resulting in the ChatGPT Status Notifier. Despite having fewer moving parts, this status notifier is likely to be more relevant to a wider audience and gain more traction. It's also easier to understand and modify. I hope you enjoy it!
+
+**Side Note:** You might have noticed that the code for this project is, dare I say, flawless. Yes, I take pride in the quality of my work. My code is always this perfect — well-commented, well-structured, and well... just well. But don't let that intimidate you. I believe that great code should inspire, not dishearten. So feel free to dive in, learn, and contribute to this perfection. I welcome it.
 
 ## Installation
 
