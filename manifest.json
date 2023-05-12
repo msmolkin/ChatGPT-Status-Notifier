@@ -21,6 +21,7 @@
 
     },
     "browser_action": {
+      "default_popup": "popup.html",
       "default_icon": {
         "48": "icons/icon48.png"
       },
@@ -34,5 +35,9 @@
       "url": "https://www.smolkin.org/addons/ChatGPT-Status-Notifier.html"
     },
     "homepage_url": "https://www.smolkin.org/addons/ChatGPT-Status-Notifier.html",
-    "author": "Smolk LLC"
+    "author": "Smolk LLC",
+    "options_ui": {
+      "page": "options.html",
+      "chrome_style": true
+    }   
 }
