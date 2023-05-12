@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Is ChatGPT Typing?",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "A Firefox add-on that lets you know when ChatGPT has finished typing. Don't forget to pin the addon to your toolbar to be able to see when it finishes typing!",
     "permissions": ["tabs", "storage", "activeTab", "https://chat.openai.com/*"],
     "content_scripts": [

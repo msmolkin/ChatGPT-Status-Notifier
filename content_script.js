@@ -69,9 +69,5 @@ var checkWhetherGptTyping = function () {
 
 }
 
-// TODO possibly later:
-// if the user is in another tab, alert the user when GPT has finished typing
-// this will only run if the user checks the box in the options page (requires adding the option to the options page, checked by default)
-
 // Call updateNotification function every 500ms
 setInterval(checkWhetherGptTyping, 500);
