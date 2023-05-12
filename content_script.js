@@ -37,17 +37,17 @@ var checkWhetherGptTyping = function () {
         }
     }
 
-    const isGenerating = gptGeneratingButton && gptGeneratingButton.getAttribute('playing') === 'true';
+    const isGenerating = gptGeneratingButton && gptGeneratingButton.getAttribute('typing') === 'true';
     let counter = 0; let showCounter = false;    // Counter to count how long it takes to generate a response
     
     if (gptGeneratingButton) {
         if (!isGenerating && gptGeneratingButton.innerText === 'Stop generating') {
             // This is the case where the user has clicked "Regenerate response" and the response is being generated
-            gptGeneratingButton.setAttribute('playing', 'true');
+            gptGeneratingButton.setAttribute('typing', 'true');
             counter++; showCounter = true;
         } else if (!isGenerating && gptGeneratingButton.innerText === 'Regenerate response') { // TODO: why does this work?
             // This is the case where the user has clicked "Stop generating" or the response has been generated
-            gptGeneratingButton.setAttribute('playing', 'false');
+            gptGeneratingButton.setAttribute('typing', 'false');
 
             // I can inject the time that it took to generate a response into the page here.
             if (showCounter){
@@ -59,7 +59,7 @@ var checkWhetherGptTyping = function () {
 
 
         // Send a message to the background script
-        browser.runtime.sendMessage({ type: "updateGeneratingState", data: gptGeneratingButton.getAttribute('playing') === 'true' });
+        browser.runtime.sendMessage({ type: "updateGeneratingState", data: gptGeneratingButton.getAttribute('typing') === 'true' });
 } else {
         // if url contains /c/, then the user is in a chat
         if (window.location.href.includes('/c/')) {
