@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.4] - 2023-05-17
+
+### Added
+- Added a checkbox in the extension popup to enable or disable sounds.
+- Users can now easily enable or disable the sound feature directly from the extension popup without accessing the options page.
+
 ## [0.0.3] - 2023-05-12
 
 ### Added
