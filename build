@@ -1,0 +1,18 @@
+#!/bin/bash
+read -p "Are you running this from the root of the project? (y/n) " response
+read -p "Have you updated the version number in the manifest? (y/n) " response
+if [[ $response =~ ^[Yy]$ ]]
+then
+    counter=1
+    filename="addon_v001.zip"
+
+    while [ -f "build/$filename" ]; do
+        counter=$((counter+1))
+        filename="addon_v00$counter.zip"
+    done
+    echo "Creating $filename"
+    zip -r build/$filename . -x "*.git*" "*todo.md" "*images/*" "*.DS_Store" "*.zip*" "*build/*" # "*sounds.js"
+else
+    echo "Please update it before proceeding."
+    exit 1
+fi
