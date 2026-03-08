@@ -8,7 +8,7 @@ This repository hosts the code for the Firefox Addon, "AI Chat Status Notifier".
 ## Features
 
 - Real-time notification when ChatGPT, Claude, or Gemini finishes typing
-- Support for multiple AI tabs simultaneously, even when actively running in the background
+- Support for concurrent tabs (Note: Works best when the AI chatting is the actively-focused tab within its respective window, as complex web apps may suspend DOM rendering while entirely hidden)
 - Easy to use and lightweight
 - Maintains your privacy - no data is stored or transmitted
 
