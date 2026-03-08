@@ -116,9 +116,9 @@ function checkGeminiTyping() {
 /**
  * Notifies the user whether AI is still generating a response.
  */
-let prevGeneratingState = false;
 let responseTimeCounter = 0;
 let timerInterval = null;
+let isGeneratingState = false;
 
 function checkAITypingStatus() {
   const siteType = getSiteType();
@@ -132,11 +132,9 @@ function checkAITypingStatus() {
     isGenerating = checkGeminiTyping();
   }
   
-  // State transitions
-  if (isGenerating !== prevGeneratingState) {
-    // AI started typing
-    if (isGenerating && !prevGeneratingState) {
-      // Reset and start counter
+  // State transitions for local logging
+  if (isGenerating !== isGeneratingState) {
+    if (isGenerating && !isGeneratingState) {
       responseTimeCounter = 0;
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
@@ -144,63 +142,43 @@ function checkAITypingStatus() {
       }, 1000);
     }
     
-    // AI finished typing
-    if (!isGenerating && prevGeneratingState) {
-      // Stop counter and log time
+    if (!isGenerating && isGeneratingState) {
       if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
         console.log(`${siteType} response time: ${responseTimeCounter} seconds`);
       }
-      stopObserving();
     }
-    
-    // Send message to background script
-    browser.runtime.sendMessage({
-      type: "updateGeneratingState",
-      data: isGenerating,
-      site: siteType
-    });
-    prevGeneratingState = isGenerating;
+    isGeneratingState = isGenerating;
   }
+  
+  return { isGenerating, site: siteType };
 }
 
-// Event-driven logic
-let observer = null;
-let isObserving = false;
-
-function startObserving() {
-  if (isObserving) return;
-  
-  observer = new MutationObserver(() => {
-    checkAITypingStatus();
+// Event-driven logic: tell background script to start checking us
+function handleUserAction() {
+  browser.runtime.sendMessage({
+    type: "startObserving",
+    site: getSiteType()
   });
-  
-  observer.observe(document.body, { childList: true, subtree: true, attributes: true });
-  isObserving = true;
-  
-  // Do an initial check immediately
-  checkAITypingStatus();
-}
-
-function stopObserving() {
-  if (observer) {
-    observer.disconnect();
-    isObserving = false;
-  }
 }
 
 // Start observing when user presses Enter (without Shift) or clicks a button
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
-    // Wait a brief moment for the UI to update to a generating state
-    setTimeout(startObserving, 100);
+    handleUserAction();
   }
 });
 
 document.addEventListener('click', (e) => {
   const target = e.target.closest('button') || e.target.closest('[role="button"]');
   if (target) {
-    setTimeout(startObserving, 100);
+    handleUserAction();
+  }
+});
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "checkStatus") {
+    return Promise.resolve(checkAITypingStatus());
   }
 });

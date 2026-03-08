@@ -13,7 +13,8 @@
  * Badge the app icon with "typing…" when AI (ChatGPT or Claude) is generating a response.
  * Also play a sound when the response is ready.
  */
-let tabStates = {}; // Map of tabId -> { isGenerating: boolean, site: string }
+let tabStates = {}; // Map of tabId -> { isChecking: boolean, isGenerating: boolean, site: string, hasStarted: boolean, checks: number }
+let checkInterval = null;
 
 // Evaluates all tracked tabs and updates the extension badge accordingly
 function evaluateGlobalState(lastActiveSite) {
@@ -66,24 +67,69 @@ function playNotificationSound(site) {
     });
 }
 
-browser.runtime.onMessage.addListener((message, sender) => {
-    if (message.type === "updateGeneratingState" && sender.tab) {
-        const tabId = sender.tab.id;
-        const isGenerating = Boolean(message.data);
-        const site = message.site || "unknown"; 
+function startBackgroundPolling() {
+    if (checkInterval) return;
+    
+    checkInterval = setInterval(() => {
+        let activeChecks = 0;
         
-        const prevState = tabStates[tabId] ? tabStates[tabId].isGenerating : false;
-        
-        // Track the typing state mapped to this specific tab
-        tabStates[tabId] = { isGenerating, site };
-        
-        // If this specific tab just finished generating, play the sound immediately
-        if (!isGenerating && prevState) {
-            playNotificationSound(site);
+        for (const tabIdStr in tabStates) {
+            const tabId = parseInt(tabIdStr, 10);
+            const state = tabStates[tabId];
+            
+            if (!state.isChecking) continue;
+            
+            activeChecks++;
+            
+            browser.tabs.sendMessage(tabId, { type: "checkStatus" }).then((response) => {
+                if (!response) return;
+                
+                const isGenerating = response.isGenerating;
+                const site = response.site || state.site;
+                const prevState = state.isGenerating;
+                
+                state.isGenerating = isGenerating;
+                state.site = site;
+                state.checks++;
+                
+                if (isGenerating && !state.hasStarted) {
+                    state.hasStarted = true;
+                }
+                
+                if (!isGenerating && prevState && state.hasStarted) {
+                    // Finished generating!
+                    playNotificationSound(site);
+                    state.isChecking = false; // Stop checking this tab
+                } else if (!isGenerating && !state.hasStarted && state.checks > 120) {
+                    // Never started generating after 60 seconds (120 checks). Abort polling to save resources.
+                    state.isChecking = false;
+                }
+                
+                evaluateGlobalState(site);
+                
+            }).catch((err) => {
+                // Tab might have been closed, navigated away, or disconnected
+                state.isChecking = false;
+                evaluateGlobalState(state.site);
+            });
         }
         
-        // Re-evaluate the overall badge/icon state across all tabs
-        evaluateGlobalState(site);
+        // If no tabs need checking, turn off the interval
+        if (activeChecks === 0) {
+            clearInterval(checkInterval);
+            checkInterval = null;
+        }
+        
+    }, 500);
+}
+
+browser.runtime.onMessage.addListener((message, sender) => {
+    if (message.type === "startObserving" && sender.tab) {
+        const tabId = sender.tab.id;
+        const site = message.site || "unknown"; 
+        
+        tabStates[tabId] = { isChecking: true, isGenerating: false, site: site, hasStarted: false, checks: 0 };
+        startBackgroundPolling();
     }
 });
 
