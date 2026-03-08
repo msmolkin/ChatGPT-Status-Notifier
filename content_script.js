@@ -177,8 +177,22 @@ document.addEventListener('click', (e) => {
   }
 });
 
+let originalTitle = document.title;
+let titleExclamationTimeout = null;
+
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "checkStatus") {
     return Promise.resolve(checkAITypingStatus());
+  } else if (message.type === "showTitleExclamation") {
+    // Save the original title just in case it changed since page load
+    if (!document.title.startsWith("(!) ")) {
+      originalTitle = document.title;
+      document.title = "(!) " + originalTitle;
+    }
+  } else if (message.type === "hideTitleExclamation") {
+    // Restore the title explicitly, removing the exactly matched (!)
+    if (document.title.startsWith("(!) ")) {
+      document.title = document.title.substring(4);
+    }
   }
 });
