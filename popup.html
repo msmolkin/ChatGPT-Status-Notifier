@@ -21,6 +21,34 @@
         color: #fff;
         border: 1px solid #777;
       }
+      .feedback-link { color: #88ccff; }
+    }
+    
+    .feedback-section {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid #ccc;
+      text-align: center;
+      width: 100%;
+      font-size: 13px;
+    }
+    .feedback-buttons {
+      display: flex;
+      justify-content: space-evenly;
+      margin-top: 8px;
+    }
+    .feedback-buttons button {
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 4px;
+    }
+    .hidden { display: none !important; }
+    .feedback-link {
+      display: inline-block;
+      margin-top: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #0066cc;
     }
   </style>
 </head>
@@ -31,7 +59,19 @@
       <input type="checkbox" id="soundCheckbox">
       Sound
     </label>
-    <button id="optionsButton">Options</button>
+    <button id="optionsButton" style="margin-top: 10px;">Options</button>
+    
+    <div class="feedback-section" id="feedbackContainer">
+      <div id="feedbackPrompt">Are you enjoying the extension?</div>
+      
+      <div class="feedback-buttons" id="feedbackButtons">
+        <button id="btnYes">Yes 👍</button>
+        <button id="btnNo">No 👎</button>
+      </div>
+      
+      <a href="https://addons.mozilla.org/en-US/firefox/addon/ai-status-notifier/reviews/" target="_blank" id="linkRate" class="feedback-link hidden">Rate us on the Add-on Store!</a>
+      <a href="mailto:addons@smolkin.org?subject=Feedback%20on%20AI%20Chat%20Status%20Notifier" target="_blank" id="linkEmail" class="feedback-link hidden">Help us improve (Email Support)</a>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>
