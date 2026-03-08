@@ -14,9 +14,8 @@
  * Also play a sound when the response is ready.
  */
 let tabStates = {}; // Map of tabId -> { isGenerating: boolean, site: string }
-let prevGlobalGeneratingState = false;
 
-// Evaluates all tracked tabs and updates the extension badge/sound accordingly
+// Evaluates all tracked tabs and updates the extension badge accordingly
 function evaluateGlobalState(lastActiveSite) {
     let anyGenerating = false;
     let activeSite = lastActiveSite || "unknown";
@@ -36,38 +35,35 @@ function evaluateGlobalState(lastActiveSite) {
         browser.browserAction.setBadgeBackgroundColor({ color: badgeColor });
     } else {
         browser.browserAction.setBadgeText({ text: "" });
-        
-        // Play a sound ONLY if AI was typing globally and has now stopped completely
-        if (prevGlobalGeneratingState) {
-            browser.browserAction.setBadgeText({ text: "!" });
-            console.log(`AI response ready!`);
-            browser.storage.local.get("playSound").then((result) => {
-                if (result.playSound) {
-                    try {
-                        let audioBase64 = ding;
-                        var audio = new Audio(audioBase64);
-                        let playPromise = audio.play();
-                        
-                        // Handle the play promise to catch any errors
-                        if (playPromise !== undefined) {
-                            playPromise.then(() => {
-                                // Audio is playing
-                                console.log("Sound played successfully");
-                            }).catch(error => {
-                                console.error("Error playing sound:", error);
-                            });
-                        }
-                    } catch (error) {
-                        console.error(`Error playing sound: ${error}`);
-                    }
-                }
-            }).catch((error) => {
-                console.error(`Error: ${error}`);
-            });
-        }
     }
-    
-    prevGlobalGeneratingState = anyGenerating;
+}
+
+function playNotificationSound(site) {
+    browser.browserAction.setBadgeText({ text: "!" });
+    console.log(`${site} response ready!`);
+    browser.storage.local.get("playSound").then((result) => {
+        if (result.playSound) {
+            try {
+                let audioBase64 = ding;
+                var audio = new Audio(audioBase64);
+                let playPromise = audio.play();
+                
+                // Handle the play promise to catch any errors
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // Audio is playing
+                        console.log("Sound played successfully");
+                    }).catch(error => {
+                        console.error("Error playing sound:", error);
+                    });
+                }
+            } catch (error) {
+                console.error(`Error playing sound: ${error}`);
+            }
+        }
+    }).catch((error) => {
+        console.error(`Error: ${error}`);
+    });
 }
 
 browser.runtime.onMessage.addListener((message, sender) => {
@@ -76,8 +72,15 @@ browser.runtime.onMessage.addListener((message, sender) => {
         const isGenerating = Boolean(message.data);
         const site = message.site || "unknown"; 
         
+        const prevState = tabStates[tabId] ? tabStates[tabId].isGenerating : false;
+        
         // Track the typing state mapped to this specific tab
         tabStates[tabId] = { isGenerating, site };
+        
+        // If this specific tab just finished generating, play the sound immediately
+        if (!isGenerating && prevState) {
+            playNotificationSound(site);
+        }
         
         // Re-evaluate the overall badge/icon state across all tabs
         evaluateGlobalState(site);

@@ -152,6 +152,7 @@ function checkAITypingStatus() {
         timerInterval = null;
         console.log(`${siteType} response time: ${responseTimeCounter} seconds`);
       }
+      stopObserving();
     }
     
     // Send message to background script
@@ -164,5 +165,42 @@ function checkAITypingStatus() {
   }
 }
 
-// Call updateNotification function every 500ms
-setInterval(checkAITypingStatus, 500);
+// Event-driven logic
+let observer = null;
+let isObserving = false;
+
+function startObserving() {
+  if (isObserving) return;
+  
+  observer = new MutationObserver(() => {
+    checkAITypingStatus();
+  });
+  
+  observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+  isObserving = true;
+  
+  // Do an initial check immediately
+  checkAITypingStatus();
+}
+
+function stopObserving() {
+  if (observer) {
+    observer.disconnect();
+    isObserving = false;
+  }
+}
+
+// Start observing when user presses Enter (without Shift) or clicks a button
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    // Wait a brief moment for the UI to update to a generating state
+    setTimeout(startObserving, 100);
+  }
+});
+
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('button') || e.target.closest('[role="button"]');
+  if (target) {
+    setTimeout(startObserving, 100);
+  }
+});
