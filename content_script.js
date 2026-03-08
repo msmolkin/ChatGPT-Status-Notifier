@@ -28,6 +28,8 @@ function getSiteType() {
     return 'chatgpt';
   } else if (window.location.href.includes('claude.ai')) {
     return 'claude';
+  } else if (window.location.href.includes('gemini.google.com')) {
+    return 'gemini';
   }
   return 'unknown';
 }
@@ -37,20 +39,15 @@ function getSiteType() {
  * @returns {boolean} - True if ChatGPT is typing, false otherwise
  */
 function checkChatGPTTyping() {
-  // Use the composer-submit-button ID which is consistently present in the new UI. We need to query the DOM each time because React may unmount and remount (`let` instead of `const`).
-  // the button with the same ID but different properties
+  // Check using the composer-submit-button ID
   let submitButton = document.getElementById('composer-submit-button');
   
   if (submitButton) {
-    // Check the aria-label to determine the state
-    const ariaLabel = submitButton.getAttribute('aria-label');
-    
-    // When ChatGPT is typing, the button shows "Stop streaming" or "Stop generating"
-    if (ariaLabel === 'Stop streaming' || ariaLabel === 'Stop generating') {
+    const isStopButton = submitButton.getAttribute('data-testid') === 'stop-button' || 
+                         submitButton.getAttribute('aria-label') === 'Stop streaming';
+    if (isStopButton) {
       return true;
     }
-    
-    // Otherwise, it's not typing (either idle or user is typing)
     return false;
   }
   
@@ -97,6 +94,26 @@ function checkClaudeTyping() {
 }
 
 /**
+ * Checks if Gemini is currently typing
+ * @returns {boolean} - True if Gemini is typing, false otherwise
+ */
+function checkGeminiTyping() {
+  // Look for the stop button using its class instead of a brittle exact ARIA string
+  const stopButtonByClass = document.querySelector('button.stop');
+  if (stopButtonByClass) {
+    return true;
+  }
+  
+  // Fallback: look for buttons with an aria-label containing "top" and "esponse" (case-insensitive workaround for "Stop Response")
+  const stopButtonByAria = document.querySelector('button[aria-label*="top"][aria-label*="esponse"]');
+  if (stopButtonByAria) {
+    return true;
+  }
+  
+  return false;
+}
+
+/**
  * Notifies the user whether AI is still generating a response.
  */
 let prevGeneratingState = false;
@@ -111,6 +128,8 @@ function checkAITypingStatus() {
     isGenerating = checkChatGPTTyping();
   } else if (siteType === 'claude') {
     isGenerating = checkClaudeTyping();
+  } else if (siteType === 'gemini') {
+    isGenerating = checkGeminiTyping();
   }
   
   // State transitions

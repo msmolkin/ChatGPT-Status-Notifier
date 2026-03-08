@@ -1,13 +1,13 @@
-# ChatGPT Status Notifier
+# AI Chat Status Notifier
 
-This repository hosts the code for the Firefox Addon, "Is ChatGPT Typing?". The addon notifies users when ChatGPT, OpenAI's language model, has finished typing in the OpenAI chat. It is ideal for those who use the chat interface regularly and want real-time updates on the typing status of ChatGPT.
+This repository hosts the code for the Firefox Addon, "AI Chat Status Notifier". The addon notifies users when ChatGPT, Claude, or Gemini has finished typing in the chat. It is ideal for those who use AI chat interfaces regularly and want real-time updates on the typing status constraint-free.
 
 ![Addon Screenshot while GPT is typing](<images/screenshot typing.png>)
 ![Addon Screenshot when GPT isn't typing](<images/screenshot idle.png>)
 
 ## Features
 
-- Real-time notification when ChatGPT finishes typing
+- Real-time notification when ChatGPT, Claude, or Gemini finishes typing
 - Easy to use and lightweight
 - Maintains your privacy - no data is stored or transmitted
 
@@ -21,9 +21,9 @@ I decided to split this functionality out into its own project, resulting in the
 
 ## Installation
 
-To install the ChatGPT Status Notifier Firefox Addon:
+To install the AI Chat Status Notifier Firefox Addon:
 
-1. Visit the [Mozilla Addon Page](https://addons.mozilla.org/en-US/firefox/addon/ai-status-notifier/) for AI Chat Status Notifier.
+1. Visit the [Mozilla Addon Page](https://addons.mozilla.org/en-US/firefox/addon/chatgpt-status-notifier/) for ChatGPT Status Notifier.
 2. Click on the "Add to Firefox" button and follow the prompts.
 
 ## Building from Source
@@ -58,11 +58,13 @@ After successfully installing the ChatGPT Status Notifier, follow these steps to
 
 4. In the context menu that appears, select "Pin to Toolbar".
 
-The icon for the ChatGPT Status Notifier should now appear in your toolbar, allowing you to see when ChatGPT is typing.
+The icon for the AI Chat Status Notifier should now appear in your toolbar, allowing you to see when an AI is typing.
 
-Once pinned, navigate to [OpenAI Chat](https://chat.openai.com/). Whenever ChatGPT finishes typing, you'll see via the addon icon in your toolbar.
+Once pinned, navigate to [ChatGPT](https://chatgpt.com/), [Claude](https://claude.ai/), or [Gemini](https://gemini.google.com/). Whenever the AI finishes typing, you'll see via the addon icon in your toolbar.
 
 Remember to ensure that the addon is enabled in your Firefox Extensions settings for it to function correctly.
+
+> **Note on Languages:** If you use these AI platforms in a language other than English and the extension doesn't seem to recognize when the AI is typing, please let us know! The extension relies on certain background text elements, and we'd love to add support for your language.
 
 ## Contributing
 

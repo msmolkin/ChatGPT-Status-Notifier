@@ -1,22 +1,26 @@
 {
   "manifest_version": 2,
   "name": "AI Chat Status Notifier",
-  "version": "0.1.1",
-  "description": "A Firefox add-on that lets you know when ChatGPT or Claude has finished typing. Don't forget to pin the addon to your toolbar to be able to see when it finishes typing!",
+  "version": "0.1.2",
+  "description": "A Firefox add-on that lets you know when ChatGPT, Claude, or Gemini has finished typing. Don't forget to pin the addon to your toolbar to be able to see when it finishes typing!",
   "permissions": [
     "tabs",
     "storage",
     "activeTab",
     "https://chat.openai.com/*",
     "https://chatgpt.com/*",
-    "https://claude.ai/*"
+    "https://chat.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*"
   ],
   "content_scripts": [
     {
       "matches": [
         "https://chat.openai.com/*",
         "https://chatgpt.com/*",
-        "https://claude.ai/*"
+        "https://chat.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*"
       ],
       "js": [
         "content_script.js"
@@ -36,6 +40,18 @@
   },
   "browser_action": {
     "default_popup": "popup.html",
+    "theme_icons": [
+      {
+        "light": "icons/icon48_white.png",
+        "dark": "icons/icon48.png",
+        "size": 48
+      },
+      {
+        "light": "icons/icon128_white.png",
+        "dark": "icons/icon128.png",
+        "size": 128
+      }
+    ],
     "default_icon": {
       "48": "icons/icon48.png"
     },
