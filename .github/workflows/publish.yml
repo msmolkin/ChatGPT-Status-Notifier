@@ -11,7 +11,7 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(format(github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && '"ubuntu-latest"' || vars.STUDIO_CI_UBUNTU_LATEST || '["self-hosted","macOS","ARM64","studio-macos","studio-run-{0}"]', github.run_id)) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
