@@ -1,6 +1,7 @@
 name: Publish Firefox Add-on
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -25,6 +26,22 @@ jobs:
         run: npm install -g web-ext
 
       - name: Build and Sign Add-on
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: web-ext sign --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }} --channel=listed
         env:
           WEB_EXT_SOURCE_DIR: '.'
+
+      - name: Package add-on without publishing
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: web-ext build --overwrite-dest --ignore-files 'META-INF/**'
+        env:
+          WEB_EXT_SOURCE_DIR: '.'
+
+      - name: Retain the verification package
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: notifier-package-${{ github.run_id }}
+          path: web-ext-artifacts/*.zip
+          if-no-files-found: error
+          retention-days: 7
